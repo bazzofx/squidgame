@@ -1,4 +1,4 @@
-﻿# Fake "Virus" - Squid Game CTF Challenge version 1.7
+# Fake "Virus" - Squid Game CTF Challenge version 1.8 by Cyber Samurai - PB 2025 - Happy Halloween
 # Warning: For educational/CTF purposes only
 
 # Global variables for easy modification
@@ -442,7 +442,7 @@ function Install-SquidGame {
     Set-ItemProperty -Path $regFlagPath -Name "FlagPart2" -Value "K3Y_T0_V1CT0RY}" -Force
     
     # Flag 3: In appdata (complete flag)
-    $flag3Path = Join-Path $env:APPDATA "Microsoft\Windows\squid_secret.txt"
+    $flag3Path = Join-Path $env:APPDATA "Microsoft\Windows\s_q_u_i_d.jpeg"
     "Complete Flag: SQUID{P3RS1ST3NC3_1S_K3Y_T0_V1CT0RY}`n`nCongratulations! You found the complete flag!`nBut the game isn't over until you remove ALL persistence mechanisms!" | Out-File $flag3Path -Encoding ASCII
     
     
@@ -482,14 +482,24 @@ foreach ($task in $tasks) {
     catch { }
     
     # Remove startup items
-    try {
-        $startupPath = [System.IO.Path]::Combine([Environment]::GetFolderPath("Startup"), "squid_game.vbs")
-        if (Test-Path $startupPath) {
-            Remove-Item $startupPath -Force -ErrorAction SilentlyContinue
-            Write-Host "Removed startup item" -ForegroundColor Green
+try {
+    $startupPath = [Environment]::GetFolderPath("Startup")
+    $filesToRemove = @(
+        "squid_game.vbs"
+        "icon_explosion.bat"
+        # Add more filenames here if needed
+    )
+    foreach ($file in $filesToRemove) {
+        $fullPath = [System.IO.Path]::Combine($startupPath, $file)
+        if (Test-Path $fullPath) {
+            Remove-Item $fullPath -Force -ErrorAction SilentlyContinue
+            Write-Host "Removed: $file" -ForegroundColor Green
         }
     }
-    catch { }
+}
+catch {
+    # Silently ignore any errors (permissions, in-use, etc.)
+}
     
     # Remove files
     $files = @(
@@ -500,14 +510,12 @@ foreach ($task in $tasks) {
         "$env:TEMP\squid_popup.vbs",
         "$env:TEMP\squid_delayed.vbs",
         "$env:TEMP\.squid.png",
-        "$env:APPDATA\Microsoft\Windows\squid_secret.txt",
+        "$env:APPDATA\Microsoft\Windows\s_q_u_i_d.jpeg",
         "C:\Users\Public\squid_log.txt",
         "$env:TEMP\squid_cache.dat",
         "$env:APPDATA\squid_config.ini",
         "$env:TEMP\icon_boom.bat",
         "$env:TEMP\squid_boom.bat",
-        "$startupPath\squid_game.vbs",
-        "$startupPath\icon_explosion.bat",
         "C:\Users\Public\Pictures\ghidra.ico"
     )
     
