@@ -457,7 +457,7 @@ function Uninstall-SquidGame {
     # Remove scheduled tasks
 $tasks = @(
     @{ Name = "SquidPopups"; Path = "\Notepad++\Updates\"   }
-    @{ Name = "SquidLover" ;  Path = "\PowerShell\Core\Security\Updates\"    }
+    @{ Name = "SquidLover" ;  Path = "\InternetExplorer\Core\Security\Updates\"    }
 )
 
 foreach ($task in $tasks) {
