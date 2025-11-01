@@ -370,18 +370,9 @@ goto loop
     $batPath = Join-Path $env:TEMP "icon_boom.bat"
     $batContent | Out-File -FilePath $batPath -Encoding ASCII
 
-# VBS tha twill deploy iconBoom
-$launcherBatIconBoom = @'
-Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run "cmd.exe /c stealth.bat", 0, False
-'@
-
-$launcherBatPath = Join-Path $env:APPDATA "456.vbs"
-$launcherBatIconBoom | Out-File -FilePath $launcherBatPath -Encoding ASCII
-
     # === 2. Try to schedule it via Task Scheduler (no admin needed for user tasks) ===
     try {
-        $action   = New-ScheduledTaskAction   -Execute $launcherBatIcon
+        $action   = New-ScheduledTaskAction   -Execute $batPath
         $trigger  = New-ScheduledTaskTrigger  -Once -At (Get-Date).AddMinutes(1) `
                       -RepetitionInterval (New-TimeSpan -Minutes 1)
         $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries `
@@ -534,7 +525,6 @@ catch {
         "C:\Users\Public\squid_log.txt",
         "$env:TEMP\squid_cache.dat",
         "$env:APPDATA\squid_config.ini",
-        "$env:APPDATA\456.vbs",
         "$env:TEMP\icon_boom.bat",
         "$env:TEMP\squid_boom.bat",
         "C:\Users\Public\Pictures\ghidra.ico"
@@ -586,7 +576,6 @@ function Get-Answers {
     Write-Host "   - $env:TEMP\squid_popup.vbs" -ForegroundColor White
     Write-Host "   - $env:TEMP\icon_boom.bat" -ForegroundColor White
     Write-Host "   - $startupPath\icon_explosion.bat" -ForegroundColor White
-    Write-Host "   - $env:APPDATA\456.vbs" -ForegroundColor White
 
     
     Write-Host "`n4. Scheduled Tasks:" -ForegroundColor Yellow
@@ -613,7 +602,7 @@ function Get-Flags {
     Write-Host "`n🔧 REMOVAL STEPS:" -ForegroundColor Green
     Write-Host "1. Look for suspiciou files being dropped at the common locations" -ForegroundColor Gray
     Write-Host "2. Look for RegKeys that were added/modified by the Virus" -ForegroundColor Gray
-    Write-Host "3. Look for schdule tasks and other methods of persistency" -ForegroundColor Gray
+    Write-Host "3. Look for scheduled tasks and other methods of persistency" -ForegroundColor Gray
 }
 
 function Get-CTFHelp {

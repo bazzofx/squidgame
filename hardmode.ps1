@@ -613,7 +613,7 @@ function Get-Flags {
     Write-Host "`n-> REMOVAL STEPS:" -ForegroundColor Green
     Write-Host "1. Look for suspiciou files being dropped at the common locations" -ForegroundColor Gray
     Write-Host "2. Look for RegKeys that were added/modified by the Virus" -ForegroundColor Gray
-    Write-Host "3. Look for schdule tasks and other methods of persistency" -ForegroundColor Gray
+    Write-Host "3. Look for scheduled tasks and other methods of persistency" -ForegroundColor Gray
 }
 
 function Get-CTFHelp {
