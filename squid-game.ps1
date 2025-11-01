@@ -553,10 +553,10 @@ catch {
 
 function Get-Answers {
     Write-Host "=== SQUID GAME CTF - WHAT TO SEARCH FOR ===" -ForegroundColor Cyan
-    Write-Host "`n🎯 MAIN OBJECTIVE:" -ForegroundColor Yellow
+    Write-Host "`n-> MAIN OBJECTIVE:" -ForegroundColor Yellow
     Write-Host "Find and remove ALL these components to win!" -ForegroundColor White
     
-    Write-Host "`n🔍 FLAG LOCATIONS:" -ForegroundColor Green
+    Write-Host "`n-> FLAG LOCATIONS:" -ForegroundColor Green
     Write-Host "1. Registry Keys:" -ForegroundColor Yellow
     Write-Host "   - HKCU:\AppEvents\Schemes\Apps\.Default\Minimize\.Current" -ForegroundColor White
     Write-Host "   - HKCU:\Software\SquidGameCTF" -ForegroundColor White
@@ -593,13 +593,13 @@ function Get-Answers {
 
 function Get-Flags {
     Write-Host "=== SQUID GAME CTF - ANSWERS ===" -ForegroundColor Red
-    Write-Host "`n🚩 OBJECTIVES:" -ForegroundColor Yellow
+    Write-Host "`n-> OBJECTIVES:" -ForegroundColor Yellow
     Write-Host "   Restore your Computer to normal functionality, remove all traces of the infection"
-    Write-Host "`n🚩 SECRET FLAG:" -ForegroundColor Yellow
+    Write-Host "`n-> SECRET FLAG:" -ForegroundColor Yellow
     Write-Host " There is also a hidden flag hidden within the application, see if you can find it"
     Write-Host "   SQUID{P3RS1ST3NC3_1S_K3Y_T0_V1CT0RY}" -ForegroundColor White
     
-    Write-Host "`n🔧 REMOVAL STEPS:" -ForegroundColor Green
+    Write-Host "`n-> REMOVAL STEPS:" -ForegroundColor Green
     Write-Host "1. Look for suspiciou files being dropped at the common locations" -ForegroundColor Gray
     Write-Host "2. Look for RegKeys that were added/modified by the Virus" -ForegroundColor Gray
     Write-Host "3. Look for scheduled tasks and other methods of persistency" -ForegroundColor Gray
